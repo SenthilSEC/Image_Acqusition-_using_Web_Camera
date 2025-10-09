@@ -104,8 +104,7 @@ cv2.destroyAllWindows()
 ```
 ## Output
 
-### Name : MADHUVATHANI.V
-### Register No : 212223040107
+
 
 
 ### i) Write the frame as JPG image
