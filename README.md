@@ -1,139 +1,160 @@
-# Image Acquisition using Web Camera
+# Image-Acquisition-from-Web-Camera
+# Name:P.Senthil Arunachalam
+# Reg No:212224240147
+## AIM:
 
-### Name: Senthil Arunachalam P                                  
-### Reg No:212224240147
-
-## Aim:
- 
 To write a python program using OpenCV to capture the image from the web camera and do the following image manipulations.
 i) Write the frame as JPG 
 ii) Display the video 
 iii) Display the video by resizing the window
 iv) Rotate and display the video
 
-## Software Used
+## SOFTWARE USED:
 Anaconda - Python 3.7
-## Algorithm
+## ALGORITHM:
 ### Step 1:
-Import the cv2 and numpy package.
+Use cv2.VideoCapture(0) to access web camera
 <br>
 
 ### Step 2:
-Read the Video frame using the cv2.VideoCapture(0)
+Use cv2.imread to read the video or image
 <br>
 
 ### Step 3:
-Write the image using imwrite().
+Use cv2.imwrite to save the image
 <br>
 
 ### Step 4:
-Display the frame using the imshow().
+Use cv2.imshow to show the video
 <br>
 
 ### Step 5:
-Divide the frame into halves and assign the smaller frame and Rotate the frame using the cv2.rotate().
+End the program and close the output video window by pressing 'q'.
 <br>
 
-## Program:
+## PROGRAM:
+``` Python
+# Name:P.Senthil Arunachalam
+# Reg No:212224240147
+
+from IPython.display import display, Javascript
+from google.colab.output import eval_js
+from base64 import b64decode
+import cv2
+import numpy as np
+from google.colab.patches import cv2_imshow
+
+def capture_frame():
+    js = Javascript('''
+    async function takePhoto() {
+      const div = document.createElement('div');
+      const video = document.createElement('video');
+      div.appendChild(video);
+      document.body.appendChild(div);
+      const stream = await navigator.mediaDevices.getUserMedia({video: true});
+      video.srcObject = stream;
+      await video.play();
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      stream.getTracks().forEach(track => track.stop());
+      div.remove();
+      return canvas.toDataURL('image/jpeg', 1.0);
+    }
+    ''')
+    display(js)
+    data = eval_js('takePhoto()')
+    binary = b64decode(data.split(',')[1])
+    nparr = np.frombuffer(binary, np.uint8)
+    frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    return frame
 
 ## i) Write the frame as JPG file
-```
-import cv2
-obj = cv2.VideoCapture(0)
-while(True):
-    cap,frame = obj.read()
-    cv2.imshow('video.jpg',frame)
-    cv2.imwrite("pic.jpg",frame)
-    if cv2.waitKey(1) == ord('q'):
-        break
-obj.release()
-```
+frame = capture_frame()
+cv2.imwrite("captured_image.jpg", frame)
+print("Image saved as captured_image.jpg")
+cv2_imshow(frame)
+
+
+
+
 ## ii) Display the video
-```
-import cv2
-img = cv2.VideoCapture(0)
-while(True):
-    imagee,frame = img.read()
-    cv2.imshow('pic',frame)
-    if cv2.waitKey(1) == ord('q'):
-        break
-img.release()
-cv2.destroyAllWindows()
-```
+import time
+#ince Google Colab does not support continuous webcam streaming, a single captured frame is displayed to simulate video output
+print("Starting pseudo video capture... (Press stop button to end cell)")
+
+for i in range(5):  # capture 5 frames as demo
+    frame = capture_frame()
+    cv2_imshow(frame)
+    time.sleep(1)  # wait 1 second before next frame
+
+
+
+
+
+
 ## iii) Display the video by resizing the window
-```
-import numpy as np
-import cv2
-cap=cv2.VideoCapture(0)
-while True:
-    ret,frame=cap.read()
-    width=int(cap.get(3))
-    height=int(cap.get(4))
-    image=np.zeros(frame.shape,np.uint8)
-    smaller_frame=cv2.resize(frame,(0,0),fx=0.5,fy=0.5)
-    image[:height//2, :width//2]=smaller_frame
-    image[height//2:, :width//2]=smaller_frame
-    image[:height//2, width//2:]=smaller_frame
-    image[height//2:, width//2:]=smaller_frame
-    cv2.imshow('PIC',smaller_frame)
-    if cv2.waitKey(1)==ord('q'):
-        break
-cap.release()
-cv2.destroyAllWindows()
-```
+frame = capture_frame()
+height, width, _ = frame.shape
+smaller_frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5)
+image = np.zeros_like(frame)
+image[:height//2, :width//2] = smaller_frame
+cv2_imshow(image)
+
+
+
+
 ## iv) Rotate and display the video
+frame = capture_frame()
+rotated = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+cv2_imshow(rotated)
+
+
+
+
+
+
+
+
 ```
-import cv2
-import numpy as np
-cap = cv2.VideoCapture(0)
-while True:
-    ret, frame = cap.read() 
-    width = int(cap.get(3))
-    height = int(cap.get(4))
-    image = np.zeros(frame.shape, np.uint8) 
-    smaller_frame = cv2.resize(frame, (0,0), fx = 0.5, fy=0.5)
-    image[:height//2, :width//2] = cv2.rotate(smaller_frame,cv2.ROTATE_180)
-    image[height//2:, :width//2] = smaller_frame 
-    image[:height//2, width//2:] = smaller_frame
-    image[height//2:, width//2:] = cv2.rotate(smaller_frame,cv2.ROTATE_180)
-    cv2.imshow('NATURE_PIC', image)
-    if cv2.waitKey(1)==ord('q'):
-        break
-cap.release()
-cv2.destroyAllWindows()
-```
-## Output
-
-
-
+## OUTPUT:
 
 ### i) Write the frame as JPG image
+![(https://github.com/mohan8900/Image_Acqusition-_using_Web_Camera/blob/main/306834696-5c319921-b55e-4ec5-a6f2-f2294b0a8e72.png)](https://github.com/mohan8900/Image_Acqusition-_using_Web_Camera/blob/main/306834696-5c319921-b55e-4ec5-a6f2-f2294b0a8e72.png)
 
-<img width="640" height="480" alt="original" src="https://github.com/user-attachments/assets/ad5a546f-6e73-40f6-9dfe-baf84512392e" />
 
+
+</br>
+</br>
 
 
 ### ii) Display the video
+![Screenshot 2024-02-21 213311](https://github.com/Jaiganesh235/Image_Acqusition-_using_Web_Camera/assets/118657189/d29f2b17-edf9-4bbe-906e-b6e5a9424d12)
 
-<img width="640" height="480" alt="video" src="https://github.com/user-attachments/assets/d89e5bc0-6668-41a2-8512-038aadb5cda1" />
 
+</br>
+</br>
 
 
 ### iii) Display the video by resizing the window
+![Screenshot 2024-02-21 213416](https://github.com/Jaiganesh235/Image_Acqusition-_using_Web_Camera/assets/118657189/49686dd1-a328-4909-a5f1-ddf0567ecff6)
 
 
-<img width="640" height="480" alt="resizing" src="https://github.com/user-attachments/assets/80eafaec-436e-4ed6-9500-ea36a28528bf" />
+
+</br>
+</br>
 
 
 
 ### iv) Rotate and display the video
-
-
-<img width="640" height="480" alt="rotate" src="https://github.com/user-attachments/assets/610c02be-604b-4a87-9086-d015168dba3f" />
-
+![Screenshot 2024-02-21 213518](https://github.com/Jaiganesh235/Image_Acqusition-_using_Web_Camera/assets/118657189/2fe12628-6724-41d5-9e06-15bbfa8eacb2)
 
 
 
+</br>
+</br>
 
-## Result:
+
+## RESULT: 
 Thus the image is accessed from webcamera and displayed using openCV.
